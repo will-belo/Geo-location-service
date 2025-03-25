@@ -1,16 +1,30 @@
 <?php
 
-namespace App\Services;
+namespace GeoLocationService\Services;
 
-use App\Models\Address;
+use GeoLocationService\Contracts\AddressModelInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class GeocodingService
 {
-    protected $radius = 6371;
+    protected $radius;
+    protected $addressModel;
 
-    protected function boundingBox($latitude, $longitude, $distance = 10): array
+    public function __construct()
+    {
+        $this->radius = config('geolocation.radius');
+        $addressModelClass = config('geolocation.address_model');
+
+        if (!class_exists($addressModelClass)) {
+            throw new \Exception("A model de endereço {$addressModelClass} não existe.");
+        }
+        
+        $this->addressModel = new $addressModelClass();
+    }
+
+    protected function boundingBox(float $latitude, float $longitude, int $distance = 10): array
     {
         $maxLat = $latitude + rad2deg($distance / $this->radius);
         $minLat = $latitude - rad2deg($distance / $this->radius);
@@ -20,14 +34,15 @@ class GeocodingService
         return compact('maxLat', 'minLat', 'maxLng', 'minLng');
     }
 
-    public function findNearestAddress($latitude, $longitude, $id = 1)
+    public function findNearestAddress(float $latitude, float $longitude, int $id = 1): ?Model
     {
+        $cacheDuration = config('geolocation.cache_duration');
         $cacheKey = "nearest_concessionaire_{$latitude}_{$longitude}";
         
-        return Cache::remember($cacheKey, 60, function () use ($latitude, $longitude, $id) {
+        return Cache::remember($cacheKey, $cacheDuration, function () use ($latitude, $longitude, $id) {
             $boundingBox = $this->boundingBox($latitude, $longitude);
 
-            return Address::with('store')
+            return $this->addressModel::with('relatedEntity')
                 ->select('id', DB::raw("
                     ($this->radius * acos(
                         cos(radians($latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians($longitude)) +
@@ -36,7 +51,7 @@ class GeocodingService
                 "))
                 ->whereBetween('latitude', [$boundingBox['minLat'], $boundingBox['maxLat']])
                 ->whereBetween('longitude', [$boundingBox['minLng'], $boundingBox['maxLng']])
-                ->whereHas('store')
+                ->whereHas('relatedEntity')
                 ->orderBy('distance', 'asc')
                 ->first();
         });

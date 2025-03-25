@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace GeoLocationService\Services;
 
 use Illuminate\Support\Facades\Http;
 
@@ -10,10 +10,10 @@ class GeoCodingAPI
 
     public function __construct()
     {
-        $this->apiKey = config('services.google_maps.api_key');
+        $this->apiKey = config('geolocation.google_api_key');
     }
 
-    public function getCoordinates($address)
+    public function getCoordinates(string $address): ?array
     {
         $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($address) . "&key=" . $this->apiKey;
 
