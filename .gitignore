@@ -1,0 +1,3 @@
+echo ".env" > .gitignore
+echo "vendor/" >> .gitignore
+echo "node_modules/" >> .gitignore
