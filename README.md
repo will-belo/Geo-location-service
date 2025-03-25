@@ -99,4 +99,9 @@ Se você configurou a chave da API do Google Maps, você também pode usar o ser
 Este projeto está sob a licença MIT.
 
 
-![MIT License](https://img.shields.io/badge/License-MIT-green.svg) ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MIT License](https://img.shields.io/badge/License-MIT-green.svg) 
+
+---
+
+
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white) ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
